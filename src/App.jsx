@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addTodo, deleteTodo, toggleTodo } from './App/Features/Todo/todoSlice';
 
 const App = () => {
-  const [text, SetText] = useState();
+  const [text, SetText] = useState('');
   const [editId, setEditId] = useState(null);
   const todos = useSelector(state => state.todos);
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ const App = () => {
     if (text.trim()) {
       if (editId) {
         dispatch(deleteTodo(editId));
-        dispatch(addTodo(`${text} (edited)`));
+        dispatch(addTodo(`${text} (Edited)`));
         setEditId(null);
       } else {
         dispatch(addTodo(text));
@@ -43,67 +43,73 @@ const App = () => {
   };
 
   return (
-    <div>
-      <div className=' flex items-center justify-center mt-20'>
-        <h1 className='text-3xl font-bold text-blue-600'>Redux Todo App</h1>
-      </div>
-      <div className='text-center mx-auto mt-20  '>
-        <div>
+    <div className='min-h-screen bg-gray-100 text-gray-800 py-10 px-4'>
+      <div className='max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6'>
+        <h1 className='text-3xl font-bold text-center mb-6 text-[#2F4F6F]'>
+          Redux Todo App
+        </h1>
+        <div className='flex flex-col sm:flex-row items-center justify-center gap-4 mb-6'>
           <input
             type='text'
             value={text}
             onChange={e => SetText(e.target.value)}
-            placeholder='Enter your Todo list'
-            className='w-60 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm text-gray-700 placeholder-gray-400'
+            placeholder='Enter your Todo...'
+            className='w-full sm:w-auto flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2F4F6F] bg-gray-50 text-gray-700 placeholder-gray-400'
           />
           <button
-            className='px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200'
+            className='px-6 py-2 bg-[#2F4F6F] text-white font-semibold rounded-lg shadow-md hover:bg-[#243b55] focus:outline-none focus:ring-2 focus:ring-[#2F4F6F] transition duration-200'
             onClick={handleAddTodo}
           >
             {editId ? 'Edit Todo' : 'Add Todo'}
           </button>
         </div>
-        <div>
-          <ul>
-            {todos.map(todo => (
-              <>
-                <li
-                  kay={todo.id}
-                  className={`flex justify-between items-center p-3 rounded-lg shadow-lg ${
-                    todo.completed ? 'bg-green-100' : 'bg-gray-100'
-                  }`}
+        <div className='space-y-4'>
+          {todos.map(todo => (
+            <div
+              key={todo.id}
+              onClick={() => dispatch(toggleTodo(todo.id))}
+              className={`flex flex-col sm:flex-row justify-between items-center p-4 rounded-lg shadow-sm transition duration-200 cursor-pointer ${
+                todo.completed ? 'bg-green-100' : 'bg-gray-50'
+              }`}
+            >
+              <div
+                className={`flex flex-col cursor-pointer w-full sm:w-auto ${
+                  todo.completed
+                    ? 'line-through text-gray-500'
+                    : 'text-gray-800'
+                }`}
+              >
+                <span className='text-lg'>{todo.text}</span>
+                <span className='text-sm text-gray-500'>
+                  {new Date(todo.id).toLocaleString()}
+                </span>
+              </div>
+              <div className='flex space-x-2 mt-2 sm:mt-0'>
+                <button
+                  // onClick={() => handleEditTodo(todo)}
+                  onClick={e => {
+                    e.stopPropagation();
+                    dispatch(deleteTodo(todo.id));
+                  }}
+                  className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition'
                 >
-                  <div
-                    onClick={() => dispatch(toggleTodo(todo.id))}
-                    className={` flex flex-col cursor-pointer ${
-                      todo.completed
-                        ? 'line-through text-gray-500'
-                        : 'text-gray-800'
-                    }`}
-                  >
-                    <span>{todo.text}</span>
-                    <span>{new Date(todo.id).toLocaleString()}</span>
-                  </div>
-
-                  <div class='flex space-x-2'>
-                    <button
-                      onClick={() => handleEditTodo(todo)}
-                      class='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition'
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => dispatch(deleteTodo(todo.id))}
-                      class='px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition'
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              </>
-            ))}
-          </ul>
+                  Edit
+                </button>
+                <button
+                  onClick={() => dispatch(deleteTodo(todo.id))}
+                  className='px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition'
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+        {todos.length === 0 && (
+          <p className='text-center text-gray-500 mt-6'>
+            No todos yet! Add some tasks to get started.
+          </p>
+        )}
       </div>
     </div>
   );
